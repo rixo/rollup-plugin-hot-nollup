@@ -15,6 +15,7 @@
   "scripts": {
     "test": "echo TODO"
   },
+  "files": ["*.js"],
   "dependencies": {
     "@rollup/pluginutils": "^3.1.0"
   }
