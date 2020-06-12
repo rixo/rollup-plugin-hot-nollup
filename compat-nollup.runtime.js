@@ -13,7 +13,7 @@ if (!g[globalKey]) {
   const afterCallbacks = []
 
   const fire = listeners => (...args) =>
-    listeners.filter(Boolean).forEach(fn => fn(...args))
+    Promise.all(listeners.filter(Boolean).map(fn => fn(...args)))
 
   const addListenerTo = listeners => fn => {
     listeners.push(fn)
@@ -61,6 +61,11 @@ if (!g[globalKey]) {
     }
   }
 
+  module.hot.addStatusHandler(status => {
+    if (status === 'check') notifyStart()
+    if (status === 'idle') notifyEnd()
+  })
+
   g[globalKey] = {
     hotStates: {},
     notifyStart,
@@ -71,7 +76,13 @@ if (!g[globalKey]) {
   }
 }
 
-const reload = () => window.reload()
+const reload = () => {
+  if (typeof window !== 'undefined') {
+    window.location.reload()
+  } else {
+    console.warn('[HMR] Full reload required')
+  }
+}
 
 export default m => {
   const { id, hot } = m
