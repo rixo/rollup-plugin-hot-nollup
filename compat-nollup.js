@@ -43,15 +43,19 @@ function CompatNollup({
   }
 
   const splitFirstLine = code => {
-    const eolIndex = code.indexOf('\n')
-    if (eolIndex === -1) {
+    const regex = /(.*?)\r?\n(.*)/s
+    const matches = code.match(regex)
+    if (matches) {
+      const firstLine = matches[1]
+      const restLines = matches[2]
+      if (/\bimport\.meta\b/.test(firstLine)) {
+        return [firstLine, restLines, '']
+      }
+      return [firstLine, '', restLines]
+    }
+    else {
       return ['', '', code]
     }
-    const firstLine = code.slice(0, eolIndex)
-    if (/\bimport\.meta\b/.test(firstLine)) {
-      return [firstLine, code.slice(eolIndex + 1), '']
-    }
-    return [firstLine, '', code.slice(eolIndex + 1)]
   }
 
   const hasComment = line =>
